@@ -22,18 +22,13 @@ int main(){
     fseek(filePtr,0, SEEK_END); 
     fileLen= ftell(filePtr); 
     printf("the length of the entire file is: %d\n",fileLen);
-    //fseek(filePtr, 0, SEEK_SET);
-    rewind(filePtr);
+    fseek(filePtr, 0, SEEK_SET);
+
+
     //buffer to read the file content
     char primaryBuffer[fileLen];
-   
-
 	//Read file contents into buffer
     fread(primaryBuffer,1,fileLen,filePtr);
-    //primaryBuffer[fileLen] = 0;
-    
-   // printf("This is what I want---------------:%c\n", primaryBuffer[]);
-   
     int pointerPosition;
     pointerPosition = 0;
     while (pointerPosition < fileLen-1){
@@ -62,8 +57,10 @@ int readTypeZero(char* buffer, int currIndex)
     printf("current index:%d\n", currIndex);
     
     for(int i = 0; i < amount; i++){
+        short swapped[1];
         memcpy(tempBuffer, (buffer+currIndex+2)+ i*2, 2);
-        printf("%d\n", tempBuffer[0]);
+        swapped[0] = (tempBuffer[0]>>8) | (tempBuffer[0]<<8); //change the byte order
+        printf("%d\n", swapped[0]);
     }
     printf("\nPointer Position:%d\n", currIndex+2+(amount*2));
     return (currIndex+2+(amount*2));
@@ -71,7 +68,8 @@ int readTypeZero(char* buffer, int currIndex)
 }
 
 
-int readTypeOne(char* buffer, int currIndex){
+int readTypeOne(char* buffer, int currIndex)
+{
     char amount[4]; //array to store amount followed by nul terminator
     memcpy(amount, buffer+currIndex+1, 3); // copy 3 bytes from primary buffer to amount array
     amount[3] = nul ;//last index terminated by nul terminator
