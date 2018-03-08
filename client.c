@@ -1,6 +1,6 @@
 /*
 
-  client.c
+  CLIENT.c
   ==========
   (c) Pranaya Adhikari, 2018
   Simple TCP/IP echo client.
@@ -13,8 +13,8 @@
 #include <arpa/inet.h>        /*  inet (3) funtions         */
 #include <unistd.h>           /*  misc. UNIX functions      */
 
-//#include "helper.h"           /*  Our own helper functions  */
-
+#include "helper.h"           /*  Our own helper functions  */
+#include "helper.c" 
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -27,7 +27,7 @@
 
 /*  Function declarations  */
 
-int ParseCmdLine(int argc, char *argv[], char **szAddress, char **szPort);
+//int ParseCmdLine(int argc, char *argv[], char **szAddress, char **szPort, char **filePath, char **toFormat, char **toName);
 
 
 /*  main()  */
@@ -48,22 +48,34 @@ int main(int argc, char *argv[]) {
 
     /*  Get command line arguments  */
 
-    ParseCmdLine(argc, argv, &szAddress, &szPort);
+    if (argc != 6){
+        printf("\nCommand Line Arguments not complete\n");
+        exit(EXIT_FAILURE);
+        return -1;
+    }
+    //ParseCmdLine(argc, argv, &szAddress, &szPort, &filePath, &toFormat, &toName);
+
+    szAddress = argv[1] ;
+    szPort = argv[2] ;
+    filePath = argv[3] ;
+    toFormat = argv[4];
+    toName = argv[5];
 
 
+    
     /*  Set the remote port  */
 
     port = strtol(szPort, &endptr, 0);
+    printf("\nPort %d\n", port);
     if ( *endptr ) {
-	printf("ECHOCLNT: Invalid port supplied.\n");
+	printf("CLIENT: Invalid port supplied.\n");
 	exit(EXIT_FAILURE);
     }
-	
-
+    
+    
     /*  Create the listening socket  */
-
     if ( (conn_s = socket(AF_INET, SOCK_STREAM, 0)) < 0 ) {
-	fprintf(stderr, "ECHOCLNT: Error creating listening socket.\n");
+	fprintf(stderr, "CLIENT: Error creating listening socket.\n");
 	exit(EXIT_FAILURE);
     }
 
@@ -77,32 +89,27 @@ int main(int argc, char *argv[]) {
 
 
     /*  Set the remote IP address  */
-
     if ( inet_aton(szAddress, &servaddr.sin_addr) <= 0 ) {
-	printf("ECHOCLNT: Invalid remote IP address.\n");
+	printf("CLIENT: Invalid remote IP address.\n");
 	exit(EXIT_FAILURE);
     }
 
     
     /*  connect() to the remote echo server  */
-
     if ( connect(conn_s, (struct sockaddr *) &servaddr, sizeof(servaddr) ) < 0 ) {
-	printf("ECHOCLNT: Error calling connect()\n");
+	printf("CLIENT: Error calling connect()\n");
 	exit(EXIT_FAILURE);
     }
 
 
     /*  Get string to echo from user  */
-
     printf("Enter the string to echo: ");
     fgets(buffer, MAX_LINE, stdin);
     
 
     /*  Send string to echo server, and retrieve response  */
-
     Writeline(conn_s, buffer, strlen(buffer));
     Readline(conn_s, buffer, MAX_LINE-1);
-
 
     /*  Output echoed string  */
 
@@ -112,20 +119,31 @@ int main(int argc, char *argv[]) {
 }
 
 
-int ParseCmdLine(int argc, char *argv[], char **szAddress, char **szPort, char **filePath, char **toFormat, char **toName) {
+// int ParseCmdLine(int argc, char *argv[], char **szAddress, char **szPort, char **filePath, char **toFormat, char **toName) {
 
-    if (argc != 6){
-        printf("\nCommand Line Arguments not complete");
-    }
-    int n = 1;
-    while (n < argc ) {
-        *szAddress = argv[++n];
-        *szPort = argv[++n];
-        *filePath = argv[++n];
-        *toFormat = argv[++n];
-        *toName = argv[++n];   
-	}
-	
-	exit(EXIT_SUCCESS);
-    return 0;
-}
+//     if (argc != 6){
+//         printf("\nCommand Line Arguments not complete");
+//         exit(EXIT_FAILURE);
+//         return -1;
+//     }
+    
+//     else{
+
+//         int n = 1;
+//         while (n < argc ) {
+//             printf("\nCommand Line Argument: %s\n", argv[n]);
+//             *szAddress = argv[++n];
+//             printf("\nCommand Line Argument: %s\n", argv[n]);
+//             *szPort = argv[++n];
+//             printf("\nCommand Line Argument: %s\n", argv[n]);
+//             *filePath = argv[++n];
+//             printf("\nCommand Line Argument: %s\n", argv[n]);
+//             *toFormat = argv[++n];
+//             printf("\nCommand Line Argument: %s\n", argv[n]);
+//             *toName = argv[++n]; 
+//             printf("\nCommand Line Argument: %s\n", argv[n]);  
+//         }
+//         exit(EXIT_SUCCESS);
+//         return 0;
+//     }	
+// }
