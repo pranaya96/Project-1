@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+//#include <stdint.h>
+#include <inttypes.h>
 
 
 #define nul '\0'
@@ -74,7 +76,7 @@ int readTypeOne(char* buffer, int currIndex)
     memcpy(amount, buffer+currIndex+1, 3); // copy 3 bytes from primary buffer to amount array
     amount[3] = nul ;//last index terminated by nul terminator
     printf("\n%s\n",amount);
-    int numberAmount = atoi(amount); //change ascii to integer
+    uint8_t numberAmount = atoi(amount); //change ascii to  8 bit integer
     printf("Amount:%d\t", numberAmount);
     printf("------------------");
     char tempBuffer[6]; //5 bytes is needed at max for unsigned integers no more than 65535 plus nul terminator
@@ -85,18 +87,24 @@ int readTypeOne(char* buffer, int currIndex)
     while (i < numberAmount){
         memcpy(tempBuffer+bufferTracker, buffer+currIndex+currPosOfPointer, 1);
         if(tempBuffer[bufferTracker]== 44){
+            uint16_t converted;
             tempBuffer[bufferTracker] = nul;
             bufferTracker = 0;
             currPosOfPointer ++;
             printf("%d\n", atoi(tempBuffer));
+            converted = atoi(tempBuffer);
+            printf("I want to print %" PRIu16 "\n",converted);
             i++;
             continue;
 
         }
         else if (tempBuffer[bufferTracker] == 0 || tempBuffer[bufferTracker] ==1){
+            uint16_t converted;
             tempBuffer[bufferTracker] = nul;
             i++;
             printf("%d\n", atoi(tempBuffer));
+            converted = atoi(tempBuffer);
+            printf("I want to print %" PRIu16 "\n",converted);
             //printf("\nPointer Position:%d\n",  currIndex + currPosOfPointer);
             return currIndex + currPosOfPointer;  
         }
@@ -109,4 +117,5 @@ int readTypeOne(char* buffer, int currIndex)
     return currIndex + currPosOfPointer;//for the last number 
 
 }
+
 
