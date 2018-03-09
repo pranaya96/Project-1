@@ -17,7 +17,7 @@ int main(){
    
     FILE *targetFilePtr;
 
-    targetFilePtr = fopen("testFile222", "ab+");
+    targetFilePtr = fopen("testFile223", "ab+");
     
     FILE *filePtr;
     filePtr = fopen("practice_project_test_file_1", "rb");
@@ -91,8 +91,8 @@ int readTypeZero(char* buffer, int currIndex, FILE *filePointer)
     
 
     /*To do: print according to the target format type*/
-    //printToZeroType(filePointer, amount, swapped);
-    printToOneType(filePointer, amountArrayInAscii,amount, swapped);
+    printToZeroType(filePointer, amount, swapped);
+    //printToOneType(filePointer, amountArrayInAscii,amount, swapped);
     //printf("\nPointer Position:%d\n", currIndex+2+(amount*2));
     return (currIndex+2+(amount*2));
 
@@ -135,8 +135,8 @@ int readTypeOne(char* buffer, int currIndex, FILE *filePointer)
             printf("I want to print yyy%" PRIu16 "\n",converted[i]);
             i++;
             //printf("\nPointer Position:%d\n",  currIndex + currPosOfPointer);}
-            //printToZeroType(filePointer, numberAmount, converted);
-            printToOneType(filePointer,amount ,numberAmount, converted);
+            printToZeroType(filePointer, numberAmount, converted);
+            //printToOneType(filePointer,amount ,numberAmount, converted);
             return currIndex + currPosOfPointer;  
         }
         else{ 

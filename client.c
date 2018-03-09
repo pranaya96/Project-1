@@ -20,6 +20,7 @@
 #include <stdio.h>
 
 
+
 /*  Global constants  */
 
 #define MAX_LINE           (1000)
@@ -62,7 +63,6 @@ int main(int argc, char *argv[]) {
     toName = argv[5];
 
 
-
     /*  Set the remote port  */
 
     port = strtol(szPort, &endptr, 0);
@@ -100,16 +100,51 @@ int main(int argc, char *argv[]) {
 	exit(EXIT_FAILURE);
     }
 
-
-    /*  Get string to echo from user  */
-    printf("Enter the string to echo: ");
-    fgets(buffer, MAX_LINE, stdin);
+    int fileLen;
+    FILE *filePtr;
+    filePtr = fopen(filePath, "rb");
+    if (filePtr==NULL){
+        printf("Error opening file!");
+        exit(1);
+    }
     
+    //Get the length of file
+    fseek(filePtr,0, SEEK_END); 
+    fileLen= ftell(filePtr); 
+    printf("the length of the entire file is: %d\n",fileLen);
+    fseek(filePtr, 0, SEEK_SET);
+    
+    //buffer to read the file content
+    char fileBuffer[fileLen];
+	//Read file contents into buffer
+    fread(fileBuffer,1,fileLen,filePtr);
+
+    char messageBuffer[MAX_LINE];   // to send the all the headers and data along in a buffer
+    memcpy(messageBuffer,toFormat, 1); // append target type in buffer to send
+    int fileNameLen;
+    fileNameLen = strlen(toName); //length of a target file name
+    
+    //length of file name included in buffer
+    memcpy(messageBuffer+1,&fileNameLen, sizeof(int));
+
+    //printf("%d\n", messageBuffer);
+    
+    //copy the toFileName in buffer
+    memcpy(messageBuffer+5,toName, fileNameLen); 
+
+    //copy the length of file to send in the buffer
+    memcpy(messageBuffer+5+fileNameLen, &fileLen, sizeof(int));
+
+    //copy the file to a buffer
+    memcpy(messageBuffer+5+fileNameLen+sizeof(int),fileBuffer, fileLen);
 
 
-    /*  Send string to echo server, and retrieve response  */
-    Writeline(conn_s, buffer, strlen(buffer));
-    Readline(conn_s, buffer, MAX_LINE-1);
+    /*  sending the size of file as a char array*/
+    write(conn_s, messageBuffer, MAX_LINE);
+
+
+    
+    //ReadData(conn_s, buffer, MAX_LINE-1);
 
     /*  Output echoed string  */
 

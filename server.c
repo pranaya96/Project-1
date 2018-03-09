@@ -10,15 +10,18 @@
 #include <sys/types.h>        /*  socket types              */
 #include <arpa/inet.h>        /*  inet (3) funtions         */
 #include <unistd.h>           /*  misc. UNIX functions      */
-
+#include <string.h>
 #include "helper.h"           /*  our own helper functions  */
 #include "helper.c"
 #include <stdlib.h>
 #include <stdio.h>
+#include <inttypes.h>
+
 
 
 /*  Global constants  */
-
+#define nul '\0'
+#define TRUE 1
 #define ECHO_PORT          (2002)
 #define MAX_LINE           (1000)
 
@@ -50,7 +53,7 @@ int main(int argc, char *argv[]) {
 	exit(EXIT_FAILURE);
     }
 
-    printf("creating port .........yahoooo.....");
+    //printf("creating port .........yahoooo.....");
 	
     /*  Create the listening socket  */
     if ( (list_s = socket(AF_INET, SOCK_STREAM, 0)) < 0 ) {
@@ -58,7 +61,7 @@ int main(int argc, char *argv[]) {
 	exit(EXIT_FAILURE);
     }
 
-    printf("port created.........yahoooo.....");
+    //printf("port created.........yahoooo.....");
 
     /*  Set all bytes in socket address structure to
         zero, and fill in the relevant data members   */
@@ -70,9 +73,9 @@ int main(int argc, char *argv[]) {
 
     /*  Bind our socket addresss to the 
 	listening socket, and call listen()  */
-    if ( bind(list_s, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0 ) {
-	fprintf(stderr, "SERVER: Error calling bind()\n");
-	exit(EXIT_FAILURE);
+    if (bind(list_s, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0 ) {
+        fprintf(stderr, "SERVER: Error calling bind()\n");
+        exit(EXIT_FAILURE);
     }
 
     if (listen(list_s, LISTENQ) < 0 ) {
@@ -92,13 +95,90 @@ int main(int argc, char *argv[]) {
 	    fprintf(stderr, "ECHOSERV: Error calling accept()\n");
 	    exit(EXIT_FAILURE);
 	}
-
-
 	/*  Retrieve an input line from the connected socket
 	    then simply write it back to the same socket. */
+    read(conn_s, buffer, MAX_LINE);
+    
 
-	Readline(conn_s, buffer, MAX_LINE-1);
-	Writeline(conn_s, buffer, strlen(buffer));
+    //get the format type
+    char formatType[2];
+    printf("\n------start tp copy format type-------\n");
+    formatType[0] = buffer[0];
+    formatType[1] = nul;
+    printf("\n------copied format type-------\n");
+
+    if (strstr("0123", formatType) == NULL) {
+        printf("Format Type not correct");
+        exit(EXIT_FAILURE);
+    }
+
+    
+    //length of fileName in integer
+    char fileNameLenInt[4];
+    memcpy(fileNameLenInt, buffer+1, sizeof(int));
+    //fileNameLenInt[4] = nul;
+    
+    int lenOfFileName = *fileNameLenInt;
+
+    printf("%d\n", lenOfFileName);
+
+    printf("------copied file Name integer--------\n");
+
+    // get name of target fileName
+    char targetFileName[lenOfFileName+1];
+    memcpy(targetFileName, buffer+5, lenOfFileName);
+
+    targetFileName[lenOfFileName] = nul;
+
+    printf("%s\n", targetFileName);
+    
+
+    printf("------copied file Name --------\n");
+
+    //get the length of File
+    char fileLengthInt[4];
+    memcpy(fileLengthInt, buffer+5+lenOfFileName, 4);
+    int lenOfFile = *fileLengthInt;
+
+    printf("%d\n", lenOfFile);
+
+    printf("------copied file length integer --------\n");
+
+    //get the actual data in the file now
+    char fileContent[lenOfFile];
+    memcpy(fileContent,buffer+5+lenOfFileName+4, lenOfFile);
+
+    printf("------copied file's data --------\n");
+
+    FILE *targetFilePtr;
+    targetFilePtr = fopen(targetFileName, "ab+");
+    int pointerPosition;
+    pointerPosition = 0;
+    while (pointerPosition < lenOfFile-1){
+        if (fileContent[pointerPosition] == 0) {
+            printf("\nNums of Type0:\n");
+            pointerPosition = readTypeZero(fileContent, pointerPosition, targetFilePtr);
+        }
+        if (fileContent[pointerPosition]== 1){
+            printf("\nNums of Type1:\n");
+            pointerPosition = readTypeOne(fileContent, pointerPosition, targetFilePtr);
+        }
+    }
+
+
+    printf("file conversion.....sucessful........");
+    //fclose(filePtr);
+    fclose(targetFilePtr);
+
+    //printf("First charcter%c\n", buffer[0]);
+    //printf("Fifth charcter%c\n", buffer[5]);
+    
+    
+    //ReadData(conn_s, buffer, MAX_LINE-1);
+
+    
+    
+	//WriteData(conn_s, buffer, strlen(buffer));
 
 
 	/*  Close the connected socket  */
