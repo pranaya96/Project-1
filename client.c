@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
     toName = argv[5];
 
 
-    
+
     /*  Set the remote port  */
 
     port = strtol(szPort, &endptr, 0);
@@ -89,14 +89,13 @@ int main(int argc, char *argv[]) {
 
 
     /*  Set the remote IP address  */
-    if ( inet_aton(szAddress, &servaddr.sin_addr) <= 0 ) {
+    if (inet_aton(szAddress, &servaddr.sin_addr) <= 0 ) {
 	printf("CLIENT: Invalid remote IP address.\n");
 	exit(EXIT_FAILURE);
     }
-
     
     /*  connect() to the remote echo server  */
-    if ( connect(conn_s, (struct sockaddr *) &servaddr, sizeof(servaddr) ) < 0 ) {
+    if (connect(conn_s, (struct sockaddr *) &servaddr, sizeof(servaddr) ) < 0 ) {
 	printf("CLIENT: Error calling connect()\n");
 	exit(EXIT_FAILURE);
     }
@@ -106,6 +105,7 @@ int main(int argc, char *argv[]) {
     printf("Enter the string to echo: ");
     fgets(buffer, MAX_LINE, stdin);
     
+
 
     /*  Send string to echo server, and retrieve response  */
     Writeline(conn_s, buffer, strlen(buffer));
@@ -117,6 +117,7 @@ int main(int argc, char *argv[]) {
 
     return EXIT_SUCCESS;
 }
+
 
 
 // int ParseCmdLine(int argc, char *argv[], char **szAddress, char **szPort, char **filePath, char **toFormat, char **toName) {

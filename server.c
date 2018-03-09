@@ -1,11 +1,8 @@
 /*
-
   SERVER.c
   ==========
   (c) Pranaya Adhikair, 2018
-  
   Simple TCP/IP echo server.
-
 */
 
 
@@ -32,7 +29,7 @@ int main(int argc, char *argv[]) {
     short int port;                  /*  port number               */
     struct    sockaddr_in servaddr;  /*  socket address structure  */
     char      buffer[MAX_LINE];      /*  character buffer          */
-    char     *endptr;                /*  for strtol()              */
+    char      *endptr;                /*  for strtol()              */
 
 
     /*  Get port number from the command line, and
