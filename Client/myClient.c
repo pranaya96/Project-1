@@ -12,9 +12,6 @@
 #include <sys/types.h>        /*  socket types              */
 #include <arpa/inet.h>        /*  inet (3) funtions         */
 #include <unistd.h>           /*  misc. UNIX functions      */
-
-//#include "helper.h"           /*  Our own helper functions  */
-//#include "helper.c" 
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -25,8 +22,8 @@
 #define MAX_LINE           (1000)
 #define nul '\0'
 #define TRUE 1
+#define CONFIRM_LINE (200)
 
-/*  Function declarations  */
 
 
 
@@ -47,14 +44,13 @@ int main(int argc, char *argv[]) {
 
 
     /*  Get command line arguments  */
-
     if (argc != 6){
         printf("\nCommand Line Arguments not complete\n");
         exit(EXIT_FAILURE);
         return -1;
     }
     
-
+    //get the arguments into their respective char arrays
     szAddress = argv[1] ;
     szPort = argv[2] ;
     filePath = argv[3] ;
@@ -63,7 +59,6 @@ int main(int argc, char *argv[]) {
 
 
     /*  Set the remote port  */
-
     port = strtol(szPort, &endptr, 0);
     printf("\nPort %d\n", port);
     if ( *endptr ) {
@@ -141,13 +136,13 @@ int main(int argc, char *argv[]) {
     /*  sending the size of file as a char array*/
     write(conn_s, messageBuffer, MAX_LINE);
 
-    char recievedBuffer[100];
+    char recievedBuffer[CONFIRM_LINE];
 
     
     read(conn_s, recievedBuffer, MAX_LINE-1);
 
     /*  Output echoed string  */
-    recievedBuffer[100] = nul;
+    recievedBuffer[CONFIRM_LINE] = nul;
 
     printf("Sever response: %s\n", recievedBuffer);
 

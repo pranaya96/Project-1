@@ -46,8 +46,8 @@ int readTypeZero(char* buffer, int currIndex, FILE *filePointer, char *targetTyp
 
     uint16_t tempBuffer[amount]; // temporary Buffer to store individual number 
     uint16_t swapped[amount]; 
-    printf("Amount:%d\t", amount);
-    printf("current index:%d\n", currIndex);
+    printf("Amount:%d\n", amount);
+    //printf("current index:%d\n", currIndex);
     
     for(int i = 0; i < amount; i++){
         memcpy(tempBuffer+i, (buffer+currIndex+2)+ i*2, 2);
@@ -79,8 +79,8 @@ int readTypeOne(char* buffer, int currIndex, FILE *filePointer, char* targetType
     //amount[3] = nul ;//last index terminated by nul terminator
     printf("\n%s\n",amount);
     uint8_t numberAmount = atoi(amount); //change ascii to  8 bit integer
-    printf("Amount:%d\t", numberAmount);
-    printf("------------------");
+    printf("Amount:%d\n", numberAmount);
+    //printf("------------------");
     char tempBuffer[6]; //5 bytes is needed at max for unsigned integers no more than 65535 plus nul terminator
     int currPosOfPointer = 4; // move pointer after reading the amount
     int i = 0;
@@ -94,7 +94,7 @@ int readTypeOne(char* buffer, int currIndex, FILE *filePointer, char* targetType
             tempBuffer[bufferTracker] = nul;
             bufferTracker = 0;
             currPosOfPointer ++;
-            //printf("%d\n", atoi(tempBuffer));
+            printf("%d\n", atoi(tempBuffer));
             converted[i] = atoi(tempBuffer);
             swapped[i] = (converted[i]>>8) | (converted[i]<<8);
             //printf("I want to print xxx %" PRIu16 "\n",converted[i]);  
@@ -104,7 +104,6 @@ int readTypeOne(char* buffer, int currIndex, FILE *filePointer, char* targetType
         }
         else if (tempBuffer[bufferTracker] == 0 || tempBuffer[bufferTracker] ==1){
             tempBuffer[bufferTracker] = nul;
-           
             printf("%d\n", atoi(tempBuffer));
             converted[i] = atoi(tempBuffer);
             swapped[i] = (converted[i]>>8) | (converted[i]<<8);
@@ -140,6 +139,8 @@ int readTypeOne(char* buffer, int currIndex, FILE *filePointer, char* targetType
 }
 
 
+
+/*print in zero format*/
 void printToZeroType(FILE *filePointer, uint8_t amount, uint16_t *numbersArray)
 {
     uint8_t type = 0;
@@ -153,11 +154,10 @@ void printToZeroType(FILE *filePointer, uint8_t amount, uint16_t *numbersArray)
         fwrite(&numbersArray[i], sizeof(uint16_t), 1 ,filePointer);
     }
     
-
 }
 
 
-
+/*print in one format*/
 void printToOneType(FILE *filePointer, char* arrayOfAmount,int amountCount, uint16_t *numbersArray){
     //write the type
     uint8_t type = 1;

@@ -24,6 +24,8 @@
 #define TRUE 1
 #define ECHO_PORT          (2002)
 #define MAX_LINE           (1000)
+#define CONFIRM_LINE       (200)
+
 
 
 int main(int argc, char *argv[]) {
@@ -33,11 +35,10 @@ int main(int argc, char *argv[]) {
     struct    sockaddr_in servaddr;  /*  socket address structure  */
     char      buffer[MAX_LINE];      /*  character buffer          */
     char      *endptr;                /*  for strtol()              */
-    int status; //to send back the status 'success' or 'format error' to client
+    int status;                       /*to send back the status 'success' or 'format error' to client */
 
     /*  Get port number from the command line, and
         set to default port if no arguments were supplied  */
-
     if ( argc == 2 ) {
 	port = strtol(argv[1], &endptr, 0);
 	if ( *endptr ) {
@@ -114,31 +115,23 @@ int main(int argc, char *argv[]) {
     //length of fileName in integer
     char fileNameLenInt[4];
     memcpy(fileNameLenInt, buffer+1, sizeof(int));
-    //fileNameLenInt[4] = nul;
     
     int lenOfFileName = *fileNameLenInt;
 
-    //printf("%d\n", lenOfFileName);
-
    
-
     // get name of target fileName
     char targetFileName[lenOfFileName+1];
     memcpy(targetFileName, buffer+5, lenOfFileName);
-
     targetFileName[lenOfFileName] = nul;
 
-    //printf("%s\n", targetFileName);
-    
-
-    
+   
 
     //get the length of File
     char fileLengthInt[4];
     memcpy(fileLengthInt, buffer+5+lenOfFileName, 4);
     int lenOfFile = *fileLengthInt;
 
-    //printf("%d\n", lenOfFile);
+    
 
    
 
@@ -146,7 +139,7 @@ int main(int argc, char *argv[]) {
     char fileContent[lenOfFile];
     memcpy(fileContent,buffer+5+lenOfFileName+4, lenOfFile);
 
-
+    /*file pointer to open a file in binary append(write) mode*/
     FILE *targetFilePtr;
     targetFilePtr = fopen(targetFileName, "ab+");
     int pointerPosition;
@@ -164,16 +157,25 @@ int main(int argc, char *argv[]) {
     }
 
 
-    //printf("ile conversion.....sucessful........");
-    //fclose(filePtr);
+
     fclose(targetFilePtr);
 
-    char confirmationMessage[100];
-    strncpy(confirmationMessage,"File sucessfully translated and saved in server.", 100);
-    confirmationMessage[100] = nul;
+    /* char array to send the confirmation message back to the client*/
+    char confirmationMessage[CONFIRM_LINE];
+    if (status == -1){
+        strncpy(confirmationMessage,"Format Error", CONFIRM_LINE);
+    }
+    else{
+        strncpy(confirmationMessage,"File sucessfully translated and saved in server.", CONFIRM_LINE);
 
+    }
+   
+   
+   
+    confirmationMessage[CONFIRM_LINE] = nul;
 
-    write(conn_s, confirmationMessage, 100);
+    /*write confirmation message to the socket*/
+    write(conn_s, confirmationMessage, CONFIRM_LINE);
 
 	/*  Close the connected socket  */
 	if ( close(conn_s) < 0 ) {
