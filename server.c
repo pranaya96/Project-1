@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
     struct    sockaddr_in servaddr;  /*  socket address structure  */
     char      buffer[MAX_LINE];      /*  character buffer          */
     char      *endptr;                /*  for strtol()              */
-
+    int status; //to send back the status 'success' or 'format error' to client
 
     /*  Get port number from the command line, and
         set to default port if no arguments were supplied  */
@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
     if ( argc == 2 ) {
 	port = strtol(argv[1], &endptr, 0);
 	if ( *endptr ) {
-	    fprintf(stderr, "SERVER: Invalid port number.\n");
+        fprintf(stderr, "SERVER: Invalid port number.\n");
 	    exit(EXIT_FAILURE);
     }
     }
@@ -53,7 +53,6 @@ int main(int argc, char *argv[]) {
 	exit(EXIT_FAILURE);
     }
 
-    //printf("creating port .........yahoooo.....");
 	
     /*  Create the listening socket  */
     if ( (list_s = socket(AF_INET, SOCK_STREAM, 0)) < 0 ) {
@@ -61,7 +60,6 @@ int main(int argc, char *argv[]) {
 	exit(EXIT_FAILURE);
     }
 
-    //printf("port created.........yahoooo.....");
 
     /*  Set all bytes in socket address structure to
         zero, and fill in the relevant data members   */
@@ -102,13 +100,13 @@ int main(int argc, char *argv[]) {
 
     //get the format type
     char formatType[2];
-    printf("\n------start tp copy format type-------\n");
     formatType[0] = buffer[0];
     formatType[1] = nul;
-    printf("\n------copied format type-------\n");
+
 
     if (strstr("0123", formatType) == NULL) {
         printf("Format Type not correct");
+        status = -1; // invalid formatType can't save
         exit(EXIT_FAILURE);
     }
 
@@ -120,9 +118,9 @@ int main(int argc, char *argv[]) {
     
     int lenOfFileName = *fileNameLenInt;
 
-    printf("%d\n", lenOfFileName);
+    //printf("%d\n", lenOfFileName);
 
-    printf("------copied file Name integer--------\n");
+   
 
     // get name of target fileName
     char targetFileName[lenOfFileName+1];
@@ -130,62 +128,59 @@ int main(int argc, char *argv[]) {
 
     targetFileName[lenOfFileName] = nul;
 
-    printf("%s\n", targetFileName);
+    //printf("%s\n", targetFileName);
     
 
-    printf("------copied file Name --------\n");
+    
 
     //get the length of File
     char fileLengthInt[4];
     memcpy(fileLengthInt, buffer+5+lenOfFileName, 4);
     int lenOfFile = *fileLengthInt;
 
-    printf("%d\n", lenOfFile);
+    //printf("%d\n", lenOfFile);
 
-    printf("------copied file length integer --------\n");
+   
 
     //get the actual data in the file now
     char fileContent[lenOfFile];
     memcpy(fileContent,buffer+5+lenOfFileName+4, lenOfFile);
 
-    printf("------copied file's data --------\n");
 
     FILE *targetFilePtr;
     targetFilePtr = fopen(targetFileName, "ab+");
     int pointerPosition;
     pointerPosition = 0;
     while (pointerPosition < lenOfFile-1){
+        
         if (fileContent[pointerPosition] == 0) {
             printf("\nNums of Type0:\n");
-            pointerPosition = readTypeZero(fileContent, pointerPosition, targetFilePtr);
+            pointerPosition = readTypeZero(fileContent, pointerPosition, targetFilePtr, formatType);
         }
         if (fileContent[pointerPosition]== 1){
             printf("\nNums of Type1:\n");
-            pointerPosition = readTypeOne(fileContent, pointerPosition, targetFilePtr);
+            pointerPosition = readTypeOne(fileContent, pointerPosition, targetFilePtr, formatType);
         }
     }
 
 
-    printf("file conversion.....sucessful........");
+    //printf("ile conversion.....sucessful........");
     //fclose(filePtr);
     fclose(targetFilePtr);
 
-    //printf("First charcter%c\n", buffer[0]);
-    //printf("Fifth charcter%c\n", buffer[5]);
-    
-    
-    //ReadData(conn_s, buffer, MAX_LINE-1);
+    char confirmationMessage[100];
+    strncpy(confirmationMessage,"File sucessfully translated and saved in server.", 100);
+    confirmationMessage[100] = nul;
 
-    
-    
-	//WriteData(conn_s, buffer, strlen(buffer));
 
+    write(conn_s, confirmationMessage, 100);
 
 	/*  Close the connected socket  */
-
 	if ( close(conn_s) < 0 ) {
 	    fprintf(stderr, "ECHOSERV: Error calling close()\n");
 	    exit(EXIT_FAILURE);
-	}
     }
+    exit(0);
+    }
+   
 }

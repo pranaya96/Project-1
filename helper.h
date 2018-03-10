@@ -26,10 +26,10 @@
 
 /*  Function declarations  */
 
-ssize_t ReadData(int fd, void *vptr, size_t maxlen);
-ssize_t WriteData(int fc, const void *vptr, size_t maxlen);
-int readTypeZero(char*, int, FILE*);
-int readTypeOne(char*, int, FILE*);
+//ssize_t ReadData(int fd, void *vptr, size_t maxlen);
+//ssize_t WriteData(int fc, const void *vptr, size_t maxlen);
+int readTypeZero(char*, int, FILE*, char*);
+int readTypeOne(char*, int, FILE*, char*);
 void printToZeroType(FILE *, uint8_t , uint16_t *);
 void printToOneType(FILE *, char* , int,  uint16_t *);
 

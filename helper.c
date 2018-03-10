@@ -80,7 +80,7 @@ ssize_t WriteData(int sockd, const void *vptr, size_t n) {
     return n;
 }
 
-int readTypeZero(char* buffer, int currIndex, FILE *filePointer)
+int readTypeZero(char* buffer, int currIndex, FILE *filePointer, char *targetType)
 {
     int amount; // amount of numbers 
     amount = buffer[currIndex+1]; 
@@ -102,7 +102,6 @@ int readTypeZero(char* buffer, int currIndex, FILE *filePointer)
 
     uint16_t tempBuffer[amount]; // temporary Buffer to store individual number 
     uint16_t swapped[amount]; 
-    // printf("Printing Array as a bosss%s: \n", amountArrayInAscii);
     printf("Amount:%d\t", amount);
     printf("current index:%d\n", currIndex);
     
@@ -111,10 +110,20 @@ int readTypeZero(char* buffer, int currIndex, FILE *filePointer)
         swapped[i] = (tempBuffer[i]>>8) | (tempBuffer[i]<<8); //change the byte order
         printf("%d\n", swapped[i]);
     }
-    
 
+    if (targetType[0] == '0' || targetType[0] == '2')
+    {
+        printToZeroType(filePointer, amount, tempBuffer);
+
+    } else if (targetType[0] == '1' || targetType[0] == '3'){
+        printToOneType(filePointer, amountArrayInAscii,amount, swapped);
+    }
+    else{
+        printf("Target Type error");
+        return -1;
+    }
     /*To do: print according to the target format type*/
-    printToZeroType(filePointer, amount, tempBuffer);
+  
     //printToOneType(filePointer, amountArrayInAscii,amount, swapped);
     //printf("\nPointer Position:%d\n", currIndex+2+(amount*2));
     return (currIndex+2+(amount*2));
@@ -122,7 +131,7 @@ int readTypeZero(char* buffer, int currIndex, FILE *filePointer)
 }
 
 
-int readTypeOne(char* buffer, int currIndex, FILE *filePointer)
+int readTypeOne(char* buffer, int currIndex, FILE *filePointer, char* targetType)
 {
     char amount[3]; //array to store amount followed by nul terminator
     memcpy(amount, buffer+currIndex+1, 3); // copy 3 bytes from primary buffer to amount array
@@ -161,8 +170,18 @@ int readTypeOne(char* buffer, int currIndex, FILE *filePointer)
             printf("I want to print yyy%" PRIu16 "\n",converted[i]);
             i++;
             //printf("\nPointer Position:%d\n",  currIndex + currPosOfPointer);}
-            printToZeroType(filePointer, numberAmount, swapped);
-            //printToOneType(filePointer,amount ,numberAmount, converted);
+            if (targetType[0] == '0' || targetType[0] == '1')
+            {
+                printToOneType(filePointer,amount,numberAmount, converted);
+        
+            } else if (targetType[0] == '2' || targetType[0] == '3'){
+                printToZeroType(filePointer, numberAmount, swapped);
+            }
+            else{
+                printf("Target Type error");
+                return -1;
+            }
+            
             return currIndex + currPosOfPointer;  
         }
         else{ 
@@ -172,7 +191,6 @@ int readTypeOne(char* buffer, int currIndex, FILE *filePointer)
         }
     } 
 
-    /*TO dO print according to the target format type*/
     
     
     //printToZeroType(filePointer, numberAmount, converted);
@@ -196,6 +214,8 @@ void printToZeroType(FILE *filePointer, uint8_t amount, uint16_t *numbersArray)
     
 
 }
+
+
 
 void printToOneType(FILE *filePointer, char* arrayOfAmount,int amountCount, uint16_t *numbersArray){
     //write the type

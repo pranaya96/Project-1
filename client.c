@@ -3,7 +3,7 @@
   CLIENT.c
   ==========
   (c) Pranaya Adhikari, 2018
-  Simple TCP/IP echo client.
+  Simple TCP/IP client.
 
 */
 
@@ -28,7 +28,6 @@
 
 /*  Function declarations  */
 
-//int ParseCmdLine(int argc, char *argv[], char **szAddress, char **szPort, char **filePath, char **toFormat, char **toName);
 
 
 /*  main()  */
@@ -54,7 +53,7 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
         return -1;
     }
-    //ParseCmdLine(argc, argv, &szAddress, &szPort, &filePath, &toFormat, &toName);
+    
 
     szAddress = argv[1] ;
     szPort = argv[2] ;
@@ -142,44 +141,15 @@ int main(int argc, char *argv[]) {
     /*  sending the size of file as a char array*/
     write(conn_s, messageBuffer, MAX_LINE);
 
+    char recievedBuffer[100];
 
     
-    //ReadData(conn_s, buffer, MAX_LINE-1);
+    read(conn_s, recievedBuffer, MAX_LINE-1);
 
     /*  Output echoed string  */
+    recievedBuffer[100] = nul;
 
-    printf("Echo response: %s\n", buffer);
+    printf("Sever response: %s\n", recievedBuffer);
 
     return EXIT_SUCCESS;
 }
-
-
-
-// int ParseCmdLine(int argc, char *argv[], char **szAddress, char **szPort, char **filePath, char **toFormat, char **toName) {
-
-//     if (argc != 6){
-//         printf("\nCommand Line Arguments not complete");
-//         exit(EXIT_FAILURE);
-//         return -1;
-//     }
-    
-//     else{
-
-//         int n = 1;
-//         while (n < argc ) {
-//             printf("\nCommand Line Argument: %s\n", argv[n]);
-//             *szAddress = argv[++n];
-//             printf("\nCommand Line Argument: %s\n", argv[n]);
-//             *szPort = argv[++n];
-//             printf("\nCommand Line Argument: %s\n", argv[n]);
-//             *filePath = argv[++n];
-//             printf("\nCommand Line Argument: %s\n", argv[n]);
-//             *toFormat = argv[++n];
-//             printf("\nCommand Line Argument: %s\n", argv[n]);
-//             *toName = argv[++n]; 
-//             printf("\nCommand Line Argument: %s\n", argv[n]);  
-//         }
-//         exit(EXIT_SUCCESS);
-//         return 0;
-//     }	
-// }
