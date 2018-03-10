@@ -145,13 +145,15 @@ int main(int argc, char *argv[]) {
     int pointerPosition;
     pointerPosition = 0;
     while (pointerPosition < lenOfFile-1){
+        if (fileContent[0] != 0 || fileContent[0] != 1){
+            status = -1;
+            break;
+        } 
         
         if (fileContent[pointerPosition] == 0) {
-            printf("\nNums of Type0:\n");
             pointerPosition = readTypeZero(fileContent, pointerPosition, targetFilePtr, formatType);
         }
         if (fileContent[pointerPosition]== 1){
-            printf("\nNums of Type1:\n");
             pointerPosition = readTypeOne(fileContent, pointerPosition, targetFilePtr, formatType);
         }
     }
